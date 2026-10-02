@@ -1,0 +1,1629 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Наша маленька гра ❤️</title>
+
+  <style>
+    :root {
+      --bg: #fff8f6;
+      --card: rgba(255, 255, 255, 0.94);
+      --text: #3f3032;
+      --muted: #806b6e;
+      --accent: #d96b83;
+      --accent-dark: #b84e67;
+      --soft: #f8dce3;
+      --border: #f0cbd3;
+      --shadow: 0 20px 55px rgba(112, 55, 70, 0.14);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        Arial,
+        sans-serif;
+
+      color: var(--text);
+
+      background:
+        radial-gradient(
+          circle at 15% 10%,
+          rgba(255, 214, 224, 0.7),
+          transparent 28%
+        ),
+        radial-gradient(
+          circle at 85% 85%,
+          rgba(255, 231, 210, 0.65),
+          transparent 30%
+        ),
+        var(--bg);
+
+      overflow-x: hidden;
+    }
+
+    /* =========================
+       ПЛАВАЮЧІ СЕРДЕЧКА
+    ========================= */
+
+    .hearts {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 0;
+    }
+
+    .heart {
+      position: absolute;
+      bottom: -30px;
+      opacity: 0.18;
+      animation: floatUp linear infinite;
+      font-size: 20px;
+    }
+
+    @keyframes floatUp {
+      from {
+        transform: translateY(0) rotate(0deg);
+        opacity: 0;
+      }
+
+      15% {
+        opacity: 0.18;
+      }
+
+      85% {
+        opacity: 0.18;
+      }
+
+      to {
+        transform: translateY(-115vh) rotate(25deg);
+        opacity: 0;
+      }
+    }
+
+    /* =========================
+       ОСНОВНИЙ КОНТЕЙНЕР
+    ========================= */
+
+    .app {
+      position: relative;
+      z-index: 1;
+
+      width: min(760px, calc(100% - 32px));
+
+      margin: 0 auto;
+
+      padding: 34px 0 56px;
+    }
+
+    .hero,
+    .card,
+    .final-card {
+      background: var(--card);
+
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+
+      border: 1px solid rgba(255, 255, 255, 0.9);
+
+      box-shadow: var(--shadow);
+
+      border-radius: 28px;
+    }
+
+    /* =========================
+       ВСТУП
+    ========================= */
+
+    .hero {
+      padding: 34px 28px 30px;
+
+      text-align: center;
+
+      margin-bottom: 20px;
+    }
+
+    .hero h1 {
+      margin: 0 0 12px;
+
+      font-family: Georgia, "Times New Roman", serif;
+
+      font-size: clamp(31px, 7vw, 48px);
+
+      font-weight: 600;
+
+      letter-spacing: -0.02em;
+    }
+
+    .hero p {
+      margin: 0;
+
+      color: var(--muted);
+
+      line-height: 1.65;
+
+      font-size: 16px;
+    }
+
+    /* =========================
+       ПРОГРЕС
+    ========================= */
+
+    .progress-wrap {
+      margin-top: 24px;
+    }
+
+    .progress-label {
+      display: flex;
+
+      justify-content: space-between;
+
+      color: var(--muted);
+
+      font-size: 13px;
+
+      margin-bottom: 8px;
+    }
+
+    .progress {
+      height: 7px;
+
+      border-radius: 99px;
+
+      background: #f1e3e5;
+
+      overflow: hidden;
+    }
+
+    .progress > span {
+      display: block;
+
+      height: 100%;
+
+      width: 0%;
+
+      border-radius: inherit;
+
+      background:
+        linear-gradient(
+          90deg,
+          #e58ba0,
+          #c85b75
+        );
+
+      transition: width 0.45s ease;
+    }
+
+    /* =========================
+       КРОКИ
+    ========================= */
+
+    .card {
+      padding: 28px;
+
+      display: none;
+
+      animation: cardIn 0.45s ease;
+    }
+
+    .card.active {
+      display: block;
+    }
+
+    @keyframes cardIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .step {
+      display: inline-flex;
+
+      align-items: center;
+
+      gap: 8px;
+
+      padding: 7px 11px;
+
+      border-radius: 999px;
+
+      background: var(--soft);
+
+      color: var(--accent-dark);
+
+      font-size: 13px;
+
+      font-weight: 700;
+
+      margin-bottom: 17px;
+    }
+
+    .prompt {
+      font-size: 17px;
+
+      line-height: 1.75;
+    }
+
+    .prompt p {
+      margin: 0 0 14px;
+    }
+
+    .prompt p:last-child {
+      margin-bottom: 0;
+    }
+
+    /* =========================
+       КНОПКИ ВИБОРУ
+    ========================= */
+
+    .choices {
+      display: grid;
+
+      gap: 10px;
+
+      margin-top: 22px;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    .choice {
+      width: 100%;
+
+      text-align: left;
+
+      border: 1px solid var(--border);
+
+      background: #fffafb;
+
+      color: var(--text);
+
+      padding: 14px 16px;
+
+      border-radius: 16px;
+
+      cursor: pointer;
+
+      transition: 0.2s ease;
+    }
+
+    .choice:hover {
+      transform: translateY(-1px);
+
+      border-color: var(--accent);
+
+      background: #fff4f6;
+    }
+
+    .choice.selected {
+      border-color: var(--accent);
+
+      background: #ffe9ee;
+
+      box-shadow:
+        0 0 0 3px
+        rgba(217, 107, 131, 0.12);
+    }
+
+    /* =========================
+       ПОЛЯ ВВОДУ
+    ========================= */
+
+    .input-row {
+      display: flex;
+
+      gap: 10px;
+
+      margin-top: 22px;
+    }
+
+    .answer-input {
+      flex: 1;
+
+      min-width: 0;
+
+      border: 1px solid var(--border);
+
+      border-radius: 16px;
+
+      padding: 14px 16px;
+
+      outline: none;
+
+      background: #fffafb;
+
+      color: var(--text);
+    }
+
+    .answer-input:focus {
+      border-color: var(--accent);
+
+      box-shadow:
+        0 0 0 3px
+        rgba(217, 107, 131, 0.11);
+    }
+
+    .primary {
+      border: 0;
+
+      border-radius: 16px;
+
+      padding: 14px 19px;
+
+      background:
+        linear-gradient(
+          135deg,
+          #df7890,
+          #c85b75
+        );
+
+      color: white;
+
+      font-weight: 700;
+
+      cursor: pointer;
+
+      box-shadow:
+        0 8px 20px
+        rgba(200, 91, 117, 0.22);
+
+      transition:
+        transform 0.2s ease,
+        opacity 0.2s ease;
+    }
+
+    .primary:hover {
+      transform: translateY(-1px);
+    }
+
+    /* =========================
+       ПОМИЛКА
+    ========================= */
+
+    .feedback {
+      min-height: 24px;
+
+      margin-top: 13px;
+
+      font-size: 14px;
+
+      color: #a2465d;
+    }
+
+    .shake {
+      animation: shake 0.35s ease;
+    }
+
+    @keyframes shake {
+      0%,
+      100% {
+        transform: translateX(0);
+      }
+
+      25% {
+        transform: translateX(-7px);
+      }
+
+      75% {
+        transform: translateX(7px);
+      }
+    }
+
+    /* =========================
+       ФІНАЛ
+    ========================= */
+
+    .final-card {
+      display: none;
+
+      padding: 34px 28px;
+
+      text-align: center;
+
+      animation: cardIn 0.5s ease;
+    }
+
+    .final-card.active {
+      display: block;
+    }
+
+    .final-card h2 {
+      font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
+
+      font-size:
+        clamp(29px, 7vw, 43px);
+
+      margin: 0 0 12px;
+    }
+
+    .final-card p {
+      color: var(--muted);
+
+      line-height: 1.7;
+
+      margin: 0 auto 22px;
+
+      max-width: 580px;
+    }
+
+    .gift {
+      display: inline-flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      min-height: 54px;
+
+      padding: 0 24px;
+
+      border-radius: 18px;
+
+      color: white;
+
+      text-decoration: none;
+
+      font-weight: 800;
+
+      background:
+        linear-gradient(
+          135deg,
+          #df7890,
+          #c85b75
+        );
+
+      box-shadow:
+        0 12px 28px
+        rgba(200, 91, 117, 0.25);
+
+      transition:
+        transform 0.2s ease;
+    }
+
+    .gift:hover {
+      transform: translateY(-2px);
+    }
+
+    .anniversary {
+      margin-top: 24px;
+
+      font-size: 18px;
+
+      color: var(--accent-dark);
+
+      font-weight: 700;
+    }
+
+    /* =========================
+       МОБІЛЬНА ВЕРСІЯ
+    ========================= */
+
+    @media (max-width: 560px) {
+
+      .app {
+        width: min(100% - 18px, 760px);
+
+        padding-top: 10px;
+      }
+
+      .hero,
+      .card,
+      .final-card {
+        border-radius: 22px;
+
+        padding: 23px 18px;
+      }
+
+      .input-row {
+        flex-direction: column;
+      }
+
+      .primary {
+        width: 100%;
+      }
+
+      .prompt {
+        font-size: 16px;
+      }
+    }
+
+  </style>
+</head>
+
+
+<body>
+
+  <!-- =========================
+       ПЛАВАЮЧІ СЕРДЕЧКА
+  ========================== -->
+
+  <div class="hearts" aria-hidden="true">
+
+    <span
+      class="heart"
+      style="left:5%;animation-duration:13s;animation-delay:0s"
+    >
+      ♥
+    </span>
+
+    <span
+      class="heart"
+      style="left:17%;animation-duration:17s;animation-delay:3s"
+    >
+      ♡
+    </span>
+
+    <span
+      class="heart"
+      style="left:31%;animation-duration:15s;animation-delay:1s"
+    >
+      ♥
+    </span>
+
+    <span
+      class="heart"
+      style="left:49%;animation-duration:19s;animation-delay:5s"
+    >
+      ♡
+    </span>
+
+    <span
+      class="heart"
+      style="left:67%;animation-duration:14s;animation-delay:2s"
+    >
+      ♥
+    </span>
+
+    <span
+      class="heart"
+      style="left:82%;animation-duration:18s;animation-delay:6s"
+    >
+      ♡
+    </span>
+
+    <span
+      class="heart"
+      style="left:93%;animation-duration:16s;animation-delay:4s"
+    >
+      ♥
+    </span>
+
+  </div>
+
+
+  <main class="app">
+
+
+    <!-- =========================
+         ВСТУП
+    ========================== -->
+
+    <section class="hero">
+
+      <h1>
+        Наша маленька гра ❤️
+      </h1>
+
+      <p>
+        Згадай нашу історію крок за кроком.<br>
+        Кожна правильна відповідь відкриє наступну частину.
+      </p>
+
+      <div class="progress-wrap">
+
+        <div class="progress-label">
+
+          <span id="progressText">
+            Крок 1 із 8
+          </span>
+
+          <span id="digitsText">
+            0 / 13 цифр
+          </span>
+
+        </div>
+
+        <div class="progress">
+
+          <span id="progressBar"></span>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =========================
+         01
+    ========================== -->
+
+    <section
+      class="card active"
+      data-step="1"
+    >
+
+      <div class="step">
+        🗓️ 01
+      </div>
+
+      <div class="prompt">
+
+        <p>
+          Почнемо з самого початку.
+        </p>
+
+        <p>
+          У кожної хорошої історії є своя дата.
+        </p>
+
+        <p>
+          Згадай день, коли почалася наша.
+        </p>
+
+        <p>
+          Не рік.<br>
+          Не місяць.<br>
+          Тільки число.
+        </p>
+
+      </div>
+
+      <div class="input-row">
+
+        <input
+          class="answer-input"
+          id="a1"
+          inputmode="numeric"
+          autocomplete="off"
+          placeholder="Введи число"
+        >
+
+        <button
+          class="primary"
+          onclick="checkInput(1)"
+        >
+          Далі
+        </button>
+
+      </div>
+
+      <div
+        class="feedback"
+        id="f1"
+      ></div>
+
+    </section>
+
+
+    <!-- =========================
+         02
+    ========================== -->
+
+    <section
+      class="card"
+      data-step="2"
+    >
+
+      <div class="step">
+        🌃 02
+      </div>
+
+      <div class="prompt">
+
+        <p>
+          У кожної історії є також своє місце початку.
+        </p>
+
+        <p>
+          Шукай його на карті.
+        </p>
+
+        <p>
+          Це місто, яке стало початком цієї дуже цікавої пригоди ❤️
+        </p>
+
+        <p>
+          Що це за місто? Порахуй кількість літер у відповіді.
+        </p>
+
+        <p>
+          Це друга цифра пароля.
+        </p>
+
+      </div>
+
+      <div class="input-row">
+
+        <input
+          class="answer-input"
+          id="a2"
+          inputmode="numeric"
+          autocomplete="off"
+          placeholder="Введи кількість літер"
+        >
+
+        <button
+          class="primary"
+          onclick="checkInput(2)"
+        >
+          Далі
+        </button>
+
+      </div>
+
+      <div
+        class="feedback"
+        id="f2"
+      ></div>
+
+    </section>
+
+
+    <!-- =========================
+         03
+    ========================== -->
+
+    <section
+      class="card"
+      data-step="3"
+    >
+
+      <div class="step">
+        🕵️ 03
+      </div>
+
+      <div class="prompt">
+
+        <p>
+          Маленький тест на знання нас.
+        </p>
+
+        <p>
+          Перед тобою чотири твердження.
+        </p>
+
+        <p>
+          Тільки одне з них - неправда.
+        </p>
+
+        <p>
+          1. На першому побаченні на тобі була сіра кофта, а на мені «не шкіряна» куртка і фіолетовий шарф
+        </p>
+
+        <p>
+          2. В першу зустріч ти пригостив мене кавою та печивком
+        </p>
+
+        <p>
+          3. Наше перше побачення було в п’ятницю
+        </p>
+
+        <p>
+          4. Наш перший поцілунок був через декілька годин після першої зустрічі
+        </p>
+
+        <p>
+          Знайди брехуна! Його номер - наступна цифра твого пароля.
+        </p>
+
+      </div>
+
+      <div
+        class="choices"
+        id="choices3"
+      >
+
+        <button
+          class="choice"
+          onclick="selectChoice(1, this)"
+        >
+          1
+        </button>
+
+        <button
+          class="choice"
+          onclick="selectChoice(2, this)"
+        >
+          2
+        </button>
+
+        <button
+          class="choice"
+          onclick="selectChoice(3, this)"
+        >
+          3
+        </button>
+
+        <button
+          class="choice"
+          onclick="selectChoice(4, this)"
+        >
+          4
+        </button>
+
+      </div>
+
+      <div
+        class="feedback"
+        id="f3"
+      ></div>
+
+    </section>
+
+
+    <!-- =========================
+         04
+    ========================== -->
+
+    <section
+      class="card"
+      data-step="4"
+    >
+
+      <div class="step">
+        🌼 04
+      </div>
+
+      <div class="prompt">
+
+        <p>
+          Є одна квітка, яка для більшості людей - просто квітка.
+        </p>
+
+        <p>
+          А для нас вона асоціюється з «нашою датою» - її аромат і кількість, подарована мені тобою ☺️
+        </p>
+
+        <p>
+          Згадай, яка це квітка і, придивись уважно, яка цифра ховається за першою буквою її назви.
+        </p>
+
+        <p>
+          Це наступна цифра твого пароля.
+        </p>
+
+      </div>
+
+      <div class="input-row">
+
+        <input
+          class="answer-input"
+          id="a4"
+          inputmode="numeric"
+          autocomplete="off"
+          placeholder="Введи цифру"
+        >
+
+        <button
+          class="primary"
+          onclick="checkInput(4)"
+        >
+          Далі
+        </button>
+
+      </div>
+
+      <div
+        class="feedback"
+        id="f4"
+      ></div>
+
+    </section>
+
+
+    <!-- =========================
+         05
+    ========================== -->
+
+    <section
+      class="card"
+      data-step="5"
+    >
+
+      <div class="step">
+        🧳 05
+      </div>
+
+      <div class="prompt">
+
+        <p>
+          Наша історія почалася з однієї зустрічі.
+          А потім у ній ставало все більше моментів, які ми проживали вже разом.
+        </p>
+
+        <p>
+          Одним із таких моментів була наша перша спільна подорож в інше місто.
+        </p>
+
+        <p>
+          З тобою не було страшно чи тривожно. Мені дуже тепло згадувати, як тоді ми створювали спогади разом 🫧🐡🗽
+        </p>
+
+        <p>
+          Який це був місяць?
+          Його номер і стане наступною цифрою твого пароля.
+        </p>
+
+      </div>
+
+      <div class="input-row">
+
+        <input
+          class="answer-input"
+          id="a5"
+          inputmode="numeric"
+          autocomplete="off"
+          placeholder="Номер місяця"
+        >
+
+        <button
+          class="primary"
+          onclick="checkInput(5)"
+        >
+          Далі
+        </button>
+
+      </div>
+
+      <div
+        class="feedback"
+        id="f5"
+      ></div>
+
+    </section>
+
+
+    <!-- =========================
+         06
+    ========================== -->
+
+    <section
+      class="card"
+      data-step="6"
+    >
+
+      <div class="step">
+        🌍 06
+      </div>
+
+      <div class="prompt">
+
+        <p>
+          Після цього у нашої історії з’явилося чимало нових місць 🤗
+        </p>
+
+        <p>
+          Ми разом перетинали кордони, відкривали незнайомі міста, гуляли новими вулицями, пробували щось уперше і привозили додому не лише фотографії, а й свої маленькі спогади ❤️
+        </p>
+
+        <p>
+          Згадай усі країни, в яких ми побували разом.
+        </p>
+
+        <p>
+          Не рахуй ті, де ми були окремо.
+          Тільки наші спільні.
+        </p>
+
+        <p>
+          Скільки їх назбиралося?
+        </p>
+
+        <p>
+          Це число стане наступною цифрою твого пароля.
+        </p>
+
+      </div>
+
+      <div class="input-row">
+
+        <input
+          class="answer-input"
+          id="a6"
+          inputmode="numeric"
+          autocomplete="off"
+          placeholder="Кількість країн"
+        >
+
+        <button
+          class="primary"
+          onclick="checkInput(6)"
+        >
+          Далі
+        </button>
+
+      </div>
+
+      <div
+        class="feedback"
+        id="f6"
+      ></div>
+
+    </section>
+
+
+    <!-- =========================
+         07
+    ========================== -->
+
+    <section
+      class="card"
+      data-step="7"
+    >
+
+      <div class="step">
+        💍 07
+      </div>
+
+      <div class="prompt">
+
+        <p>
+          У нашої історії є не одна важлива дата.
+        </p>
+
+        <p>
+          Є та, з якої все почалося.
+          А є та, коли ми сказали одне одному «так» і почали вже зовсім іншу частину нашої історії ❤️
+        </p>
+
+        <p>
+          Згадай той день.
+          Якого числа і місяця ми стали сімʼєю?
+        </p>
+
+        <p>
+          Це число підкаже тобі наступну цифру твого пароля. Подарунок вже близько 🤗
+        </p>
+
+      </div>
+
+      <div class="input-row">
+
+        <input
+          class="answer-input"
+          id="a7"
+          inputmode="numeric"
+          autocomplete="off"
+          placeholder="Число і місяць"
+        >
+
+        <button
+          class="primary"
+          onclick="checkInput(7)"
+        >
+          Далі
+        </button>
+
+      </div>
+
+      <div
+        class="feedback"
+        id="f7"
+      ></div>
+
+    </section>
+
+
+    <!-- =========================
+         08
+    ========================== -->
+
+    <section
+      class="card"
+      data-step="8"
+    >
+
+      <div class="step">
+        🧩 08
+      </div>
+
+      <div class="prompt">
+
+        <p>
+          Останній шматочок 🥳
+        </p>
+
+        <p>
+          Ми вже згадали чимало.
+        </p>
+
+        <p>
+          У кожного з цих моментів є своя дата, своє місце і свій спогад.
+          Але найцінніше для мене - те, що всі вони стали нашими ❤️
+        </p>
+
+        <p>
+          Тепер залишилося зовсім трішки.
+        </p>
+
+        <p>
+          Згадай, скільки років ми вже пишемо цю історію разом?
+        </p>
+
+        <p>
+          Це остання цифра твого паролю 🙌
+        </p>
+
+      </div>
+
+      <div class="input-row">
+
+        <input
+          class="answer-input"
+          id="a8"
+          inputmode="numeric"
+          autocomplete="off"
+          placeholder="Кількість років"
+        >
+
+        <button
+          class="primary"
+          onclick="checkInput(8)"
+        >
+          Далі
+        </button>
+
+      </div>
+
+      <div
+        class="feedback"
+        id="f8"
+      ></div>
+
+    </section>
+
+
+    <!-- =========================
+         ФІНАЛ
+    ========================== -->
+
+    <section
+      class="final-card"
+      id="final"
+    >
+
+      <div
+        style="
+          font-size:46px;
+          margin-bottom:8px;
+        "
+      >
+        🎉❤️
+      </div>
+
+      <h2>
+        Ти впорався!
+      </h2>
+
+      <p>
+        Тепер у тебе є всі цифри.
+      </p>
+
+      <p>
+        Якщо ти все згадав правильно - відкриється дещо, що я приготувала для нас.
+      </p>
+
+      <p>
+        І, здається, це буде цікавий фінал цієї маленької гри.
+        Або, можливо, тільки початок наступної пригоди 😉😘
+      </p>
+
+      <a
+        class="gift"
+        href="https://drive.google.com/file/d/1_PINkrf09a5T1BH8Tm12Nc6t9RTacqmj/view"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Відкрити подарунок 🎁
+      </a>
+
+      <div class="anniversary">
+        З нашою річницею ❤️
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <script>
+
+    /*
+      =====================================
+      ПРАВИЛЬНІ ВІДПОВІДІ
+      =====================================
+
+      01 → 2
+      02 → 6
+      03 → 3
+      04 → 10
+      05 → 1
+      06 → 6
+      07 → 2110
+      08 → 12
+
+      ФІНАЛЬНИЙ ПАРОЛЬ:
+
+      2631016211012
+    */
+
+
+    const answers = [
+      "2",
+      "6",
+      "3",
+      "10",
+      "1",
+      "6",
+      "2110",
+      "12"
+    ];
+
+
+    /*
+      Кількість цифр,
+      які вже відкриті після кожного кроку.
+
+      2
+      6
+      3
+      10
+      1
+      6
+      2110
+      12
+
+      Разом:
+      13 цифр
+    */
+
+    const digitsAfterStep = [
+      1,
+      2,
+      3,
+      5,
+      6,
+      7,
+      11,
+      13
+    ];
+
+
+    let currentStep = 1;
+
+
+    /* =========================
+       ПРОГРЕС
+    ========================== */
+
+    function updateProgress() {
+
+      if (currentStep > 8) {
+
+        document.getElementById(
+          "progressText"
+        ).textContent = "Квест завершено ❤️";
+
+        document.getElementById(
+          "digitsText"
+        ).textContent = "13 / 13 цифр";
+
+        document.getElementById(
+          "progressBar"
+        ).style.width = "100%";
+
+        return;
+      }
+
+
+      const completedSteps =
+        currentStep - 1;
+
+
+      const completedDigits =
+        completedSteps > 0
+          ? digitsAfterStep[completedSteps - 1]
+          : 0;
+
+
+      document.getElementById(
+        "progressText"
+      ).textContent =
+        `Крок ${currentStep} із 8`;
+
+
+      document.getElementById(
+        "digitsText"
+      ).textContent =
+        `${completedDigits} / 13 цифр`;
+
+
+      document.getElementById(
+        "progressBar"
+      ).style.width =
+        `${(completedDigits / 13) * 100}%`;
+    }
+
+
+    /* =========================
+       ПОКАЗАТИ КРОК
+    ========================== */
+
+    function showStep(step) {
+
+      document
+        .querySelectorAll(".card")
+        .forEach(card => {
+          card.classList.remove("active");
+        });
+
+
+      const card =
+        document.querySelector(
+          `[data-step="${step}"]`
+        );
+
+
+      if (card) {
+        card.classList.add("active");
+      }
+
+
+      currentStep = step;
+
+
+      updateProgress();
+
+
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+      });
+    }
+
+
+    /* =========================
+       НОРМАЛІЗАЦІЯ
+    ========================== */
+
+    function normalize(value) {
+
+      return String(value)
+        .trim()
+        .replace(/\s+/g, "")
+        .toLowerCase();
+
+    }
+
+
+    /* =========================
+       НЕПРАВИЛЬНА ВІДПОВІДЬ
+    ========================== */
+
+    function wrong(step) {
+
+      const card =
+        document.querySelector(
+          `[data-step="${step}"]`
+        );
+
+
+      const feedback =
+        document.getElementById(
+          `f${step}`
+        );
+
+
+      feedback.textContent =
+        "Спробуй ще раз ❤️";
+
+
+      card.classList.remove(
+        "shake"
+      );
+
+
+      void card.offsetWidth;
+
+
+      card.classList.add(
+        "shake"
+      );
+    }
+
+
+    /* =========================
+       ПРАВИЛЬНА ВІДПОВІДЬ
+    ========================== */
+
+    function correct(step) {
+
+      document.getElementById(
+        `f${step}`
+      ).textContent = "";
+
+
+      if (step < 8) {
+
+        showStep(step + 1);
+
+        return;
+      }
+
+
+      /*
+        Останній крок
+      */
+
+      document
+        .querySelectorAll(".card")
+        .forEach(card => {
+          card.classList.remove("active");
+        });
+
+
+      document
+        .getElementById("final")
+        .classList.add("active");
+
+
+      currentStep = 9;
+
+
+      updateProgress();
+
+
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+      });
+
+    }
+
+
+    /* =========================
+       ПЕРЕВІРКА ВІДПОВІДІ
+    ========================== */
+
+    function checkInput(step) {
+
+      const input =
+        document.getElementById(
+          `a${step}`
+        );
+
+
+      const value =
+        normalize(input.value);
+
+
+      const correctAnswer =
+        answers[step - 1];
+
+
+      if (
+        value === correctAnswer
+      ) {
+
+        correct(step);
+
+      } else {
+
+        wrong(step);
+
+      }
+
+    }
+
+
+    /* =========================
+       КРОК 03
+       ВИБІР БРЕХУНА
+    ========================== */
+
+    function selectChoice(
+      value,
+      button
+    ) {
+
+      document
+        .querySelectorAll(
+          "#choices3 .choice"
+        )
+        .forEach(btn => {
+          btn.classList.remove(
+            "selected"
+          );
+        });
+
+
+      button.classList.add(
+        "selected"
+      );
+
+
+      if (
+        String(value) === "3"
+      ) {
+
+        correct(3);
+
+      } else {
+
+        wrong(3);
+
+      }
+
+    }
+
+
+    /* =========================
+       ENTER У ПОЛЯХ
+    ========================== */
+
+    document
+      .querySelectorAll(
+        ".answer-input"
+      )
+      .forEach(input => {
+
+        input.addEventListener(
+          "keydown",
+          event => {
+
+            if (
+              event.key === "Enter"
+            ) {
+
+              const step =
+                Number(
+                  input.id.slice(1)
+                );
+
+
+              checkInput(step);
+
+            }
+
+          }
+        );
+
+      });
+
+
+    /* =========================
+       СТАРТ
+    ========================== */
+
+    updateProgress();
+
+  </script>
+
+</body>
+</html>
